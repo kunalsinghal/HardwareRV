@@ -22,14 +22,28 @@ class Circuit:
           return None
 
   def verify(self):
-    def isOperator(symbol):
-      return True
+    mapping = {
+      '+': (2, lambda x: x[0] + x[1]),
+      '-': (2, lambda x: x[0] - x[1]),
+      '*': (2, lambda x: x[0] * x[1]),
+      '/': (2, lambda x: x[0] / x[1]),
+      '||': (2, lambda x: x[0] or x[1]),
+      '&&': (2, lambda x: x[0] and x[1]),
+      '>': (2, lambda x: x[0] > x[1]),
+      '<': (2, lambda x: x[0] < x[1]),
+      '>=': (2, lambda x: x[0] >= x[1]),
+      '<=': (2, lambda x: x[0] <= x[1]),
+      '!': (2, lambda x: not x[0])
+    }
 
-    def getArity(symbol):
-      return 2
+    def isOperator(symbol):
+      return symbol in mapping
+
+    def getArity(operator):
+      return mapping[operator][0]
 
     def evaluate(operator, args):
-      return True
+      return mapping[operator][1](args)
 
     stack = []
 
@@ -39,7 +53,7 @@ class Circuit:
         if arity > len(stack):
           return False
 
-        stack = stack[:-arity] + [ evaluate(operator, stack[-arity:]) ]
+        stack = stack[:-arity] + [ evaluate(symbol, stack[-arity:]) ]
       else:
         val = self.value(symbol)
         if val is not None:
@@ -47,12 +61,12 @@ class Circuit:
         else:
           return False
 
-    if len(stack) == 1:
+    if len(stack) == 1 and stack[0] == True:
       return True
     else:
       return False
 
 
 if __name__ == '__main__':
-  x = Circuit('x')
+  x = Circuit('1 2 <')
   print x.verify()
