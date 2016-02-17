@@ -68,5 +68,8 @@ class Circuit:
 
 
 if __name__ == '__main__':
-  x = Circuit('1 2 <')
-  print x.verify()
+  c = Circuit('1 x <')
+  c.update('x', 2)
+  print c.verify()
+  c.update('x', 0)
+  print c.verify()
