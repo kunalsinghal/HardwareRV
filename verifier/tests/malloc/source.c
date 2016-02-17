@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <vector>
 
 unsigned int page_alloc(int num_of_ints){
   int* ret = (int*) malloc( num_of_ints << 2 );
