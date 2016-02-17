@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <vector>
 
 unsigned int page_alloc(int num_of_ints){
   int* ret = (int*) malloc( num_of_ints << 2 );
@@ -12,6 +12,5 @@ int main(){
 
   //** page_address 0 !=
 
-  printf("%d\n", page_address); 
   return 0; 
 }
