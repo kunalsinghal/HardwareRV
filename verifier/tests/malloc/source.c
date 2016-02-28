@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 
 unsigned int page_alloc(int num_of_ints){
@@ -12,6 +11,5 @@ int main(){
 
   //** page_address 0 !=
 
-  printf("%d\n", page_address); 
   return 0; 
 }
