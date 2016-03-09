@@ -10,6 +10,8 @@ mapping = {
   '/': (2, lambda x: x[0] / x[1], 6),
   '||': (2, lambda x: x[0] or x[1], 2),
   '&&': (2, lambda x: x[0] and x[1], 3),
+  '==': (2, lambda x: x[0] == x[1], 4),
+  '!=': (2, lambda x: x[0] <> x[1], 4),
   '>': (2, lambda x: x[0] > x[1], 4),
   '<': (2, lambda x: x[0] < x[1], 4),
   '>=': (2, lambda x: x[0] >= x[1], 4),
