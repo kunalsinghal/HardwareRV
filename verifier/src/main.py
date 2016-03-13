@@ -9,35 +9,25 @@ except:
   sys.exit()
 
 
-meta = open(TEST_BASE + '/meta', 'r')
-lines = map(lambda x: x.strip(), meta.readlines())
-
-idx = 0
-for line in lines:
-  if line == 'Properties':
-    propertyIdx = idx + 2
-  elif line == 'Update Tuples':
-    tupleIdx = idx + 2
-  idx += 1
-
-meta.close()
-
+with open(TEST_BASE + '/meta', 'r') as meta:
+  lines = map(lambda x: x.strip(), meta.readlines())
 
 circuits = []
-pc_to_circuits = {}
 
-idx = propertyIdx
+idx = 2 # line number of first propoerty in meta file
 
-while lines[idx] != 'Update Tuples':
-  circuits.append(Circuit(lines[idx]))
+while idx < len(lines):
+  propoerty = lines[idx].strip()
+  idx += 1
+  critical_pc = lines[idx].strip()
+  idx += 1
+  updates = {}
+  while idx < len(lines) and lines[idx].strip() != '':
+    pc, variable = lines[idx].split()
+    updates[pc] = variable
+    idx += 1
 
-  for pc in map(int, lines[idx+1].split()):
-    try:
-      pc_to_circuits[pc].append(len(circuits)-1)
-    except:
-      pc_to_circuits[pc] = [len(circuits)-1]
+  circuits.append(Circuit(propoerty, updates, critical_pc))
 
-  idx += 3
-
-print circuits
-print pc_to_circuits
+for i in xrange(len(circuits)):
+  print circuits[i].get_hdl(name='assertion_'+str(i))

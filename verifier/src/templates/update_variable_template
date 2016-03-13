@@ -1,0 +1,5 @@
+        if(instr_data = x"{{pc}}" and wren = '1') then
+            temp_var({{var_id}}) <= wdata;
+        end if;
+
+

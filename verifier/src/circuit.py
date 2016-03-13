@@ -1,8 +1,10 @@
+from jinja2 import Environment, PackageLoader
 # mapping contains description of every supported variable
 # FORMAT FOR DESCRIPTIONS:
 # (arity, Eval: lis -> value)
 # where Eval is the evaluation function
 # TODO: make a separate class for operators
+
 mapping = {
   '+': (2, lambda x: x[0] + x[1], 5),
   '-': (2, lambda x: x[0] - x[1], 5),
@@ -19,12 +21,33 @@ mapping = {
   '!': (2, lambda x: not x[0], 5)
 }
 
-# Circuit class emulates circuit of one property
-# in FPGA. The assumptions here are that the description
-# of input property is in postfix notation. We can easily support
-# infix notation by writing a convertor later.;
+# Three simple functions to consume the mapping dictionary
+def isOperator(symbol):
+  return symbol in mapping
+
+def getArity(operator):
+  return mapping[operator][0]
+
+def evaluate(operator, args):
+  return mapping[operator][1](args)
+
+# Circuit class emulates circuit of one property/constraint
+# in FPGA.
 
 class Circuit:
+  def __init__(self, constraint, updates={}, critical_pc=0):
+    # state stores the values of various variables
+    self.state = {}
+
+    # constraint saves the property
+    self.infix = constraint.strip()
+    self.constraint = self.infix_to_postfix(self.infix)
+
+    self.updates = updates
+    self.critical_pc = critical_pc
+    variables = updates.values()
+    self.var_index = {variables[i]: str(i) for i in xrange(len(variables))}
+
   def infix_to_postfix(self, infixexpr):
     def getPref(operator):
       if operator == '(':
@@ -56,15 +79,6 @@ class Circuit:
         postfixList.append(opStack.pop())
     return postfixList
 
-
-  def __init__(self, constraint):
-    # state stores the values of various variables
-    self.state = {}
-
-    # constraint saves the property
-    self.infix = constraint.strip()
-    self.constraint = self.infix_to_postfix(self.infix)
-
   # update the value of a certain variable
   def update(self, key, value):
     self.state[key] = value
@@ -85,16 +99,6 @@ class Circuit:
           return None
 
   def verify(self):
-    # Three simple functions to consume the mapping dictionary
-    def isOperator(symbol):
-      return symbol in mapping
-
-    def getArity(operator):
-      return mapping[operator][0]
-
-    def evaluate(operator, args):
-      return mapping[operator][1](args)
-
     stack = []
 
     # This is the standard postfix evaluation loop
@@ -122,6 +126,40 @@ class Circuit:
     else:
       return False
 
+  def print_object(self):
+    print 'Printing object', self
+    print self.infix
+    print self.updates
+    print self.critical_pc
+    print self.state
+    print self.var_index
+    print '===================='
+
+  def get_hdl(self, name):
+    def hdl(symbol):
+      if isOperator(symbol):
+        return symbol
+      try:
+        ret = hex(int(symbol))[2:]
+        ret = '0' * (8 - len(ret)) + ret
+        return 'x"' + ret + '"'
+      except:
+        return 'temp_var(' + self.var_index[symbol] + ')'
+
+    env = Environment(loader=PackageLoader('src', 'templates'))
+    circuit_hdl_template = env.get_template('circuit_hdl_template')
+    update_variable_template = env.get_template('update_variable_template')
+    check_template = env.get_template('check_template')
+
+    circuit_logic = ''
+    for key in self.updates:
+      circuit_logic += update_variable_template.render(
+        pc=key, var_id=self.var_index[self.updates[key]]
+      )
+
+    condition = ' '.join(map(hdl, self.infix.split()))
+    circuit_logic += check_template.render(pc=self.critical_pc, condition=condition)
+    return circuit_hdl_template.render(name=name, circuit_logic=circuit_logic)
 
 if __name__ == '__main__':
   c = Circuit('1 < x')

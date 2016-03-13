@@ -1,0 +1,7 @@
+        if(instr_data = x"{{pc}}") then
+            if({{condition}}) then
+                assert_out <= "0001";
+            end if;
+        end if;
+
+
