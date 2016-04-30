@@ -1,0 +1,14 @@
+never { /* a -> F  b */
+T2_init:
+	if
+	:: (!a) || (a && b) -> goto accept_all
+	:: (a && !b) -> goto T0_S2
+	fi;
+T0_S2:
+	if
+	:: (b) -> goto accept_all
+	:: (!b) -> goto T0_S2
+	fi;
+accept_all:
+	skip
+}
