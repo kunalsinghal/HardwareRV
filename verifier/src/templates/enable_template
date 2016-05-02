@@ -1,0 +1,5 @@
+        if({{condition}}) then
+            enable <= '{{value}}';
+        end if;
+
+

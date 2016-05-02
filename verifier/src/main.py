@@ -1,5 +1,5 @@
 import sys
-from circuit import Circuit
+from verifier import PropositionalVerifier
 
 try:
   TEST_BASE = sys.argv[1].strip('/')
@@ -27,7 +27,7 @@ while idx < len(lines):
     updates[pc] = variable
     idx += 1
 
-  circuits.append(Circuit(propoerty, updates, critical_pc))
+  circuits.append(PropositionalVerifier(propoerty, 'circuit_%d' % len(circuits), updates, [critical_pc, critical_pc], [critical_pc, critical_pc]))
 
 for i in xrange(len(circuits)):
-  print circuits[i].get_hdl(name='assertion_'+str(i))
+  print circuits[i].get_hdl()
