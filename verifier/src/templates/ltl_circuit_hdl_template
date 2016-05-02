@@ -1,0 +1,54 @@
+library ieee;
+use ieee.std_logic_1164.all;
+USE ieee.numeric_std.ALL;
+library grlib;
+use grlib.sparc.all;
+use grlib.stdlib.all;
+library gaisler;
+use gaisler.leon3.all;
+use gaisler.libiu.all;
+use gaisler.arith.all;
+library techmap;
+use techmap.gencomp.all;
+
+entity {{name}} is
+    port (  clk         : in std_ulogic;
+          wren        : in std_ulogic;
+          wdata       : in std_logic_vector(31 downto 0);
+          instr_data  : in std_logic_vector(31 downto 0);
+          assert_out  : out std_logic_vector(3 downto 0));
+    end;
+
+architecture Behavioral of {{name}} is
+
+type array_std_logic_vector is array (0 to 9) of std_logic_vector(31 downto 0);
+SIGNAL temp_var : array_std_logic_vector;
+SIGNAL var_Next,var_hasNext : std_logic;
+signal rq: std_logic_vector(2 downto 0);
+signal r : std_logic_vector(2 downto 0);
+
+begin
+
+    process(clk)
+    begin
+
+    if(rising_edge(clk)) then
+
+{{enables}}
+{{updates}}
+
+    end if;
+    end process;
+
+{{automaton}}
+
+    process(clk)
+    begin
+
+        if (clk'event and clk = '1') then
+                rq<=r;
+        end if;
+
+    end process;
+
+end Behavioral;
