@@ -16,19 +16,19 @@ def parse_ba(ba_string):
 
 	for line in lines[1:]:
 		if line[:-1] in states:
-			source = state_id[line[:-1]]
+			destination = state_id[line[:-1]]
 		elif line[:2] == '::':
 			matches = re.search(r':: (.+?) -> goto (.+)', line)
-			transition[source].append((matches.group(1), state_id[matches.group(2).strip()]))
+			transition[state_id[matches.group(2).strip()]].append((matches.group(1), destination))
 		elif line == 'skip':
-			transition[source].append(('true', source))
-	print transition
-	print state_id
+			transition[destination].append(('true', destination))
 
+	return transition
 
 def ltl_to_ba_string(ltl_formula):
 	return subprocess.check_output(['ltl3ba', '-f', '"' + ltl_formula + '"'])
 
+def ltl_to_ba(ltl_formula):
+	return parse_ba(ltl_to_ba_string(ltl_formula))
 if __name__ == '__main__':
-	ba_string = ltl_to_ba_string('a -> F b')
-	parse_ba(ba_string)
+	print ltl_to_ba('a -> F b')
