@@ -1,5 +1,7 @@
 from jinja2 import Environment, PackageLoader
-from operators import isOperator
+import operators
+from ltl_to_ba import ltl_to_ba
+import tokenizer
 
 class Verifier(object):
   def __init__(self, constraint, name):
@@ -9,6 +11,20 @@ class Verifier(object):
   # must overwrite
   def get_hdl(self):
     pass
+
+  def symbol_to_hdl(self, symbol):
+    if operators.isOperator(symbol) or symbol in ['(', ')']:
+      return symbol
+    elif symbol == 'true':
+      return "'1'"
+    elif symbol == 'false':
+      return "'0'"
+    try:
+      ret = hex(int(symbol))[2:]
+      ret = '0' * (8 - len(ret)) + ret
+      return 'x"' + ret + '"'
+    except:
+      return 'temp_var(' + self.var_index[symbol] + ')'
 
 class PropositionalVerifier(Verifier):
   def __init__(self, constraint, name, updates={}, enables=[], disables=[]):
@@ -20,16 +36,6 @@ class PropositionalVerifier(Verifier):
     self.disables = disables
 
   def get_hdl(self):
-    def hdl(symbol):
-      if isOperator(symbol):
-        return symbol
-      try:
-        ret = hex(int(symbol))[2:]
-        ret = '0' * (8 - len(ret)) + ret
-        return 'x"' + ret + '"'
-      except:
-        return 'temp_var(' + self.var_index[symbol] + ')'
-
     env = Environment(loader=PackageLoader('src', 'templates'))
     circuit_hdl_template = env.get_template('circuit_hdl_template')
     enable_template = env.get_template('enable_template')
@@ -61,7 +67,7 @@ class PropositionalVerifier(Verifier):
         pc=key, var_id=self.var_index[self.updates[key]]
       )
 
-    condition = ' '.join(map(hdl, self.constraint.split()))
+    condition = ' '.join(map(self.symbol_to_hdl, tokenizer.get_tokens(self.constraint)))
     circuit_logic += check_template.render(condition=condition)
     return circuit_hdl_template.render(name=self.name, circuit_logic=circuit_logic)
 
@@ -74,18 +80,23 @@ class LTLVerifier(Verifier):
     self.var_index = {variables[i]: str(i) for i in xrange(len(variables))}
     self.enables = enables
     self.disables = disables
+    self.automaton = ltl_to_ba(constraint)
+
+  def get_automaton(self):
+    def automaton_to_hdl(transitions):
+      def transition_to_hdl(transition):
+        condition, source = transition
+        condition = ' '.join(map(self.symbol_to_hdl, tokenizer.get_tokens(condition)))
+        return '(rq(%d) AND (%s))' % (source, condition)
+      return '(%s)' % (' OR '.join(map(transition_to_hdl, transitions)))
+
+    automaton = self.automaton
+    automaton = [automaton[i] for i in xrange(len(automaton))]
+
+    shift_logic = ' & '.join(map(automaton_to_hdl, automaton))
+    return 'r <= %s' % shift_logic
 
   def get_hdl(self):
-    def hdl(symbol):
-      if isOperator(symbol):
-        return symbol
-      try:
-        ret = hex(int(symbol))[2:]
-        ret = '0' * (8 - len(ret)) + ret
-        return 'x"' + ret + '"'
-      except:
-        return 'temp_var(' + self.var_index[symbol] + ')'
-
     env = Environment(loader=PackageLoader('src', 'templates'))
     ltl_circuit_hdl_template = env.get_template('ltl_circuit_hdl_template')
     enable_template = env.get_template('enable_template')
@@ -121,7 +132,9 @@ class LTLVerifier(Verifier):
       name=self.name,
       enables=enables,
       updates=updates,
-      automaton='<automaton here>')
+      automaton=self.get_automaton(),
+      automaton_sz=len(self.automaton)-1
+    )
 
 
 if __name__ == '__main__':
