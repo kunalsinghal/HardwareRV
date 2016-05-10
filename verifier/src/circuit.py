@@ -73,13 +73,14 @@ class PropositionalCircuit(Circuit):
 
 
 class LTLCircuit(Circuit):
-  def __init__(self, constraint, name, updates={}, enables=[], disables=[]):
+  def __init__(self, constraint, name, updates={}, enables=[], disables=[], resets=[]):
     super(LTLCircuit, self).__init__(constraint, name)
     self.updates = updates
     variables = list(set(updates.values()))
     self.var_index = {variables[i]: str(i) for i in xrange(len(variables))}
     self.enables = enables
     self.disables = disables
+    self.resets = resets
     self.automaton = ltl_to_ba(constraint)
 
   def get_automaton(self):
@@ -100,15 +101,17 @@ class LTLCircuit(Circuit):
     env = Environment(loader=PackageLoader('src', 'templates'))
     ltl_circuit_hdl_template = env.get_template('ltl_circuit_hdl_template')
     enable_template = env.get_template('enable_template')
+    reset_template = env.get_template('reset_template')
     update_variable_template = env.get_template('update_variable_template')
 
-    enables = ''
+    zero_value = '"%s"' % ('0' * len(self.automaton))
+    initial_value = '"1%s"' % ('0' * (len(self.automaton)-1))
 
+    enables = ''
     if len(self.enables) > 0:
       condition = ' || '.join([
         ('instr_data = x"%s"' % program_counter) for program_counter in self.enables
       ])
-
       enables += enable_template.render(
         condition=condition, value='1'
       )
@@ -117,9 +120,17 @@ class LTLCircuit(Circuit):
       condition = ' || '.join([
         ('instr_data = x"%s"' % program_counter) for program_counter in self.disables
       ])
-
       enables += enable_template.render(
         condition=condition, value='0'
+      )
+
+    resets = ''
+    if len(self.resets) > 0:
+      condition = ' || '.join([
+        ('instr_data = x"%s"' % program_counter) for program_counter in self.resets
+      ])
+      resets += reset_template.render(
+        condition=condition, initial_value=initial_value
       )
 
     updates = ''
@@ -132,11 +143,14 @@ class LTLCircuit(Circuit):
       name=self.name,
       enables=enables,
       updates=updates,
+      resets=resets,
       automaton=self.get_automaton(),
-      automaton_sz=len(self.automaton)-1
+      automaton_sz=len(self.automaton)-1,
+      zero_value=zero_value,
+      initial_value=initial_value
     )
 
 
 if __name__ == '__main__':
-  x = LTLCircuit('aa U b', 'prop1', {'1': 'aa', '21': 'b', '44': 'aa', '45': 'b'}, [22, 46], [33])
+  x = LTLCircuit('aa U b', 'prop1', {'1': 'aa', '21': 'b', '44': 'aa', '45': 'b'}, [22, 46], [33], [55, 78])
   print x.get_hdl()
