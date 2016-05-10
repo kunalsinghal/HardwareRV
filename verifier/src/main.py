@@ -1,5 +1,6 @@
 import sys
-from verifier import PropositionalVerifier
+from verifier import PropositionalCircuit, LTLCircuit
+
 
 try:
   TEST_BASE = sys.argv[1].strip('/')
@@ -27,7 +28,7 @@ while idx < len(lines):
   if parts[0] in ['propositional:', 'ltl:']:
     if constraint: # deal with the previous constraint
       if constraint[0] == 'propositional':
-        circuits.append(PropositionalVerifier(
+        circuits.append(PropositionalCircuit(
           constraint[1],
           'circuit_%d' % len(circuits),
           updates,
@@ -57,7 +58,7 @@ while idx < len(lines):
 print constraint
 if constraint: # final constraint
   if constraint[0] == 'propositional':
-    circuits.append(PropositionalVerifier(
+    circuits.append(PropositionalCircuit(
       constraint[1],
       'circuit_%d' % len(circuits),
       updates,

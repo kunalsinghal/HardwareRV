@@ -3,7 +3,7 @@ import operators
 from ltl_to_ba import ltl_to_ba
 import tokenizer
 
-class Verifier(object):
+class Circuit(object):
   def __init__(self, constraint, name):
     self.constraint = constraint.strip()
     self.name = name
@@ -26,9 +26,9 @@ class Verifier(object):
     except:
       return 'temp_var(' + self.var_index[symbol] + ')'
 
-class PropositionalVerifier(Verifier):
+class PropositionalCircuit(Circuit):
   def __init__(self, constraint, name, updates={}, enables=[], disables=[]):
-    super(PropositionalVerifier, self).__init__(constraint, name)
+    super(PropositionalCircuit, self).__init__(constraint, name)
     self.updates = updates
     variables = list(set(updates.values()))
     self.var_index = {variables[i]: str(i) for i in xrange(len(variables))}
@@ -72,9 +72,9 @@ class PropositionalVerifier(Verifier):
     return circuit_hdl_template.render(name=self.name, circuit_logic=circuit_logic)
 
 
-class LTLVerifier(Verifier):
+class LTLCircuit(Circuit):
   def __init__(self, constraint, name, updates={}, enables=[], disables=[]):
-    super(LTLVerifier, self).__init__(constraint, name)
+    super(LTLCircuit, self).__init__(constraint, name)
     self.updates = updates
     variables = list(set(updates.values()))
     self.var_index = {variables[i]: str(i) for i in xrange(len(variables))}
@@ -138,5 +138,5 @@ class LTLVerifier(Verifier):
 
 
 if __name__ == '__main__':
-  x = LTLVerifier('aa U b', 'prop1', {'1': 'aa', '21': 'b', '44': 'aa', '45': 'b'}, [22, 46], [33])
+  x = LTLCircuit('aa U b', 'prop1', {'1': 'aa', '21': 'b', '44': 'aa', '45': 'b'}, [22, 46], [33])
   print x.get_hdl()

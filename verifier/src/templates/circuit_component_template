@@ -1,0 +1,7 @@
+COMPONENT {{name}} is
+  port (  clk    		 	: in std_ulogic;
+      		wren   			: in std_ulogic;
+      		wdata 	  	: in std_logic_vector(31 downto 0);
+      		instr_data  : in std_logic_vector(31 downto 0);
+      		assert_out  : out std_logic_vector(3 downto 0));
+end COMPONENT;
