@@ -24,9 +24,9 @@ resets = []
 
 while idx < len(lines):
   parts = lines[idx].split()
-  if parts[0] in ['prop:', 'ltl:']:
+  if parts[0] in ['propositional:', 'ltl:']:
     if constraint: # deal with the previous constraint
-      if constraint[0] == 'prop':
+      if constraint[0] == 'propositional':
         circuits.append(PropositionalVerifier(
           constraint[1],
           'circuit_%d' % len(circuits),
@@ -56,7 +56,7 @@ while idx < len(lines):
 
 print constraint
 if constraint: # final constraint
-  if constraint[0] == 'prop':
+  if constraint[0] == 'propositional':
     circuits.append(PropositionalVerifier(
       constraint[1],
       'circuit_%d' % len(circuits),
@@ -68,3 +68,4 @@ if constraint: # final constraint
 
 for i in xrange(len(circuits)):
   print circuits[i].get_hdl()
+  print '-----------------------------------'
