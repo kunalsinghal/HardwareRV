@@ -138,5 +138,5 @@ class LTLVerifier(Verifier):
 
 
 if __name__ == '__main__':
-  x = LTLVerifier('a U b', 'prop1', {'1': 'a', '21': 'b', '44': 'a', '45': 'b'}, [22, 46], [33])
+  x = LTLVerifier('aa U b', 'prop1', {'1': 'aa', '21': 'b', '44': 'aa', '45': 'b'}, [22, 46], [33])
   print x.get_hdl()

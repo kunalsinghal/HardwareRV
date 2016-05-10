@@ -10,24 +10,61 @@ except:
 
 
 with open(TEST_BASE + '/meta', 'r') as meta:
-  lines = map(lambda x: x.strip(), meta.readlines())
+  lines = filter(None, map(lambda x: x.strip(), meta.readlines()))
 
 circuits = []
 
-idx = 2 # line number of first propoerty in meta file
+idx = 0
+
+constraint = None
+enables = []
+disables = []
+updates = {}
+resets = []
 
 while idx < len(lines):
-  propoerty = lines[idx].strip()
-  idx += 1
-  critical_pc = lines[idx].strip()
-  idx += 1
-  updates = {}
-  while idx < len(lines) and lines[idx].strip() != '':
-    pc, variable = lines[idx].split()
-    updates[pc] = variable
-    idx += 1
+  parts = lines[idx].split()
+  if parts[0] in ['prop:', 'ltl:']:
+    if constraint: # deal with the previous constraint
+      if constraint[0] == 'prop':
+        circuits.append(PropositionalVerifier(
+          constraint[1],
+          'circuit_%d' % len(circuits),
+          updates,
+          enables,
+          disables))
+      else:
+        pass
+    # Overwrite new constraint
+    constraint = (parts[0][:-1] , ' '.join(parts[1:]))
+    disables = []
+    enables = []
+    updates = {}
+    resets = []
 
-  circuits.append(PropositionalVerifier(propoerty, 'circuit_%d' % len(circuits), updates, [critical_pc, critical_pc], [critical_pc, critical_pc]))
+  elif parts[0] == 'enable:':
+    enables.append(parts[1])
+  elif parts[0] == 'disable:':
+    disables.append(parts[1])
+  elif parts[0] == 'reset:':
+    resets.append(parts[1])
+  elif parts[0] == 'update:':
+    updates[parts[1]] = parts[2]
+  else:
+    raise Exception('Incorrect meta file')
+  idx += 1
+
+print constraint
+if constraint: # final constraint
+  if constraint[0] == 'prop':
+    circuits.append(PropositionalVerifier(
+      constraint[1],
+      'circuit_%d' % len(circuits),
+      updates,
+      enables,
+      disables))
+  else:
+    pass
 
 for i in xrange(len(circuits)):
   print circuits[i].get_hdl()

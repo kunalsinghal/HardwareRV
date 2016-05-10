@@ -1,5 +1,5 @@
-Properties
-==========
-page_address != 0
-40001a1c
-40001a20 page_address
+prop: page_address != 0
+enable: 40001a1c
+enable: 40001a1c
+disable: 40001a1c
+update: 40001a20 page_address
