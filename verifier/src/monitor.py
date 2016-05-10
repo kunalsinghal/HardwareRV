@@ -1,6 +1,6 @@
 import sys
 from jinja2 import Environment, PackageLoader
-from verifier import PropositionalCircuit, LTLCircuit
+from circuit import PropositionalCircuit, LTLCircuit
 
 class Monitor(object):
   def __init__(self, meta):
