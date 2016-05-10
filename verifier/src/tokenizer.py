@@ -13,7 +13,7 @@ def get_tokens(string):
 			return s
 
 	tokens = tokenize.generate_tokens(StringIO(sanitize(string)).readline)
-	tokens = map(lambda x: desanitize(x[1]), tokens)
+	tokens = map(lambda x: desanitize(x[1].strip()), tokens)
 	return filter(None, tokens)
 
 if __name__ == '__main__':

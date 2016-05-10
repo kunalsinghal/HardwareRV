@@ -27,7 +27,13 @@ class Monitor(object):
               enables,
               disables))
           else:
-            pass
+            circuits.append(LTLCircuit(
+              constraint[1],
+              'circuit_%d' % len(circuits),
+              updates,
+              enables,
+              disables,
+              resets))
         # Overwrite new constraint
         constraint = (parts[0][:-1] , ' '.join(parts[1:]))
         disables = []
@@ -56,7 +62,13 @@ class Monitor(object):
           enables,
           disables))
       else:
-        pass
+        circuits.append(LTLCircuit(
+          constraint[1],
+          'circuit_%d' % len(circuits),
+          updates,
+          enables,
+          disables,
+          resets))
 
     self.circuits = circuits
     self.meta = meta
