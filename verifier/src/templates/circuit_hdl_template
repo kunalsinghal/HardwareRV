@@ -23,6 +23,7 @@ architecture Behavioral of {{name}} is
 
 type array_std_logic_vector is array (0 to 9) of std_logic_vector(31 downto 0);
 SIGNAL temp_var : array_std_logic_vector;
+SIGNAL enable: std_ulogic;
 
 begin
 

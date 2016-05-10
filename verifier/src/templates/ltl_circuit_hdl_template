@@ -23,9 +23,9 @@ architecture Behavioral of {{name}} is
 
 type array_std_logic_vector is array (0 to 9) of std_logic_vector(31 downto 0);
 SIGNAL temp_var : array_std_logic_vector;
-SIGNAL var_Next,var_hasNext : std_logic;
 signal rq: std_logic_vector({{automaton_sz}} downto 0);
 signal r : std_logic_vector({{automaton_sz}} downto 0);
+signal enable: std_ulogic;
 
 begin
 
