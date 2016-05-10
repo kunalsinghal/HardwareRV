@@ -17,6 +17,15 @@ First of all configure environment for running the verifier scripts
 ```
 source configure
 ```
+Then to generate vhdl files for the monitoring circuit, run the following command
+```
+python src/main.py <path to target directory>
+```
+target directory should contains the meta file for while circuits need to be created
 
+eg.,
+```
+python src/main.py tests/malloc
+```
 
 
