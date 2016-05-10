@@ -1,1 +1,2 @@
 {{label}}: {{name}} PORT MAP(clk,wren,wdata,instr_data,assert_out_temp({{index}}));
+

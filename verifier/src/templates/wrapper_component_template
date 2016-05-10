@@ -33,6 +33,6 @@ begin
 
 {{portmappings}}
 
-assert_out <= {{combined_result}}
+assert_out <= {{combined_result}};
 
 end Behavioral;

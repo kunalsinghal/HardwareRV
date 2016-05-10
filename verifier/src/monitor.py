@@ -1,4 +1,5 @@
 import sys
+from jinja2 import Environment, PackageLoader
 from verifier import PropositionalCircuit, LTLCircuit
 
 class Monitor(object):
@@ -60,7 +61,35 @@ class Monitor(object):
     self.circuits = circuits
     self.meta = meta
 
-  def __str__(self):
-    return  '\n\n------------------------------\n\n'.join(
-      [self.circuits[i].get_hdl() for i in xrange(len(self.circuits))]
+  def get_wrapper_hdl(self):
+    env = Environment(loader=PackageLoader('src', 'templates'))
+    wrapper_component_template = env.get_template('wrapper_component_template')
+    circuit_component_template = env.get_template('circuit_component_template')
+    portmapping_template = env.get_template('portmapping_template')
+
+
+    components = ''
+    portmappings = ''
+    for i in xrange(len(self.circuits)):
+      components += circuit_component_template.render(
+        name=self.circuits[i].name
+      )
+      portmappings += portmapping_template.render(
+        label='I%d' % i,
+        name=self.circuits[i].name,
+        index=i
+      )
+
+    combined_result = ' OR '.join(map(
+      lambda i: ('assert_out_temp(%d)' % i),
+      xrange(len(self.circuits))
+    ))
+
+    return wrapper_component_template.render(
+      components=components,
+      portmappings=portmappings,
+      combined_result=combined_result
     )
+
+  def get_circuits_hdl(self):
+    return [(circuit.name, circuit.get_hdl()) for circuit in self.circuits]
