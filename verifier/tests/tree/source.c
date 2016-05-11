@@ -16,9 +16,11 @@ void download_subtree(tree node) {
 	if (total_left == 0)
 		download_complete = true;
 
-	vector<tree> ch = node.children();
-	for(tree::iterator it = ch.begin(); it != ch.end(); it++) {
-		spawn_thread(download_subtree, *it);
+	node** ch = node.children();
+	int sz = node.num_of_children();
+
+	for(int i =0; i<sz; i++) {
+		spawn_thread(download_subtree, *ch[i]);
 	}
 }
 
