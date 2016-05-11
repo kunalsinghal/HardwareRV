@@ -1,4 +1,4 @@
-        if(({{condition}}) && enable == '1') then
+        if(({{condition}}) && enable = '1') then
             assert_out <= "0001";
         end if;
 

@@ -13,12 +13,10 @@ use techmap.gencomp.all;
 
 entity assertion is
   port (  clk         : in std_ulogic;
-          waddr       : in std_logic_vector(9 downto 0);
           wren        : in std_ulogic;
           wdata       : in std_logic_vector(31 downto 0);
           instr_data  : in std_logic_vector(31 downto 0);
           assert_out  : inout std_logic_vector(3 downto 0);
-          cwp         : in std_logic_vector(2 downto 0));
   end;
 
 

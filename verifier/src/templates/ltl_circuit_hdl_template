@@ -53,7 +53,7 @@ begin
           end if;
         end if;
 
-        if((rq = {{zero_value}}) && enable == '1') then
+        if((rq = {{zero_value}}) && enable = '1') then
             assert_out <= "0001";
         end if;
     end process;

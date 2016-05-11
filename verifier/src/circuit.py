@@ -13,8 +13,20 @@ class Circuit(object):
     pass
 
   def symbol_to_hdl(self, symbol):
+    def sanitize(x):
+      if x == '==':
+        return '='
+      elif x == '&&':
+        return 'AND'
+      elif x == '||':
+        return 'OR'
+      elif x == '!':
+        return 'NOT'
+      else:
+        return x
+
     if operators.isOperator(symbol) or symbol in ['(', ')']:
-      return symbol
+      return sanitize(symbol)
     elif symbol == 'true':
       return "'1'"
     elif symbol == 'false':
